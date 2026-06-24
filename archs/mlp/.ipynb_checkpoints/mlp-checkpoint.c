@@ -56,3 +56,10 @@ static void randn_fill(float* p, int n, float std) {
     }
 }
 
+/* fisher-yates (knuth) */
+static void shuffle(int* idx, int n) {
+    for (int i = n-1; i > 0; i--) {
+        int j = rand() % (i+1);
+        int tmp = idx[i]; idx[i] = idx[j]; idx[j] = tmp;
+    }
+}
