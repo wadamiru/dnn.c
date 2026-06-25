@@ -29,9 +29,8 @@
 #define B2           0.999f
 #define EPS_ADAM     1e-8f
 
-/* 
- * helper fns 
- */
+/** helper fns **/
+#define PI 3.14159265358979323846f
 
 static float* alloc_zero(int n) {
     float* p = calloc(n, sizeof(float));
@@ -40,7 +39,6 @@ static float* alloc_zero(int n) {
 }
 
 /* box-muller gaussian */
-#define PI 3.14159265358979323846f
 static void randn_fill(float* p, int n, float std) {
     for (int i = 0; i < n-1; i += 2) {
         int i = 0;
@@ -64,4 +62,10 @@ static void shuffle(int* idx, int n) {
         int j = rand() % (i+1);
         int tmp = idx[i]; idx[i] = idx[j]; idx[j] = tmp;
     }
+}
+/* cosine lr annealing */
+static float cosine_lr(float base, float min, int curr, int tot) {
+    if (tot <= 0) return min;
+    if (curr >= tot) return min;
+    return min + (base - min) * 0.5f * (1.0f + cosf((float)curr / (float)tot * PI));
 }
