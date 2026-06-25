@@ -29,7 +29,9 @@
 #define B2           0.999f
 #define EPS_ADAM     1e-8f
 
-/* helper fns */
+/* 
+ * helper fns 
+ */
 
 static float* alloc_zero(int n) {
     float* p = calloc(n, sizeof(float));
