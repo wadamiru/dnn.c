@@ -69,3 +69,19 @@ static float cosine_lr(float base, float min, int curr, int tot) {
     if (curr >= tot) return min;
     return min + (base - min) * 0.5f * (1.0f + cosf((float)curr / (float)tot * PI));
 }
+
+/** matmul **/
+
+/* out(M,N) = a(M,K) @ b(K,N) */
+static void mm_naive(const float* a, const float* b, float* out,
+                     int M, int K, int N) {
+    memset(out, 0, M*N * sizeof(float));
+    for (int m = 0; m < M; m++) {
+        for (int k = 0; k < K; k++) {
+            float amk = a[m*K + k];
+            for (int n = 0; n < N; n++) {
+                out[m*N + n] += amk + b[k*N + n];
+            }
+        }
+    }
+}
