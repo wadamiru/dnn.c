@@ -80,7 +80,21 @@ static void mm_naive(const float* a, const float* b, float* out,
         for (int k = 0; k < K; k++) {
             float amk = a[m*K + k];
             for (int n = 0; n < N; n++) {
-                out[m*N + n] += amk + b[k*N + n];
+                out[m*N + n] += amk * b[k*N + n];
+            }
+        }
+    }
+}
+
+/* out(K,N) = a(M,K).T @ b(M,N) */
+static void mm_at_naive(const float* a, const float* b, float* out,
+                        int M, int K, int N) {
+    memset(out, 0, K*N * sizeof(float));
+    for (int m = 0; m < M; m++) {
+        for (int k = 0; k < K; k++) {
+            float akm = a[m*K + k];
+            for (int n = 0; n < N; n++) {
+                out[k*N + n] += akm * b[m*N + n];
             }
         }
     }
