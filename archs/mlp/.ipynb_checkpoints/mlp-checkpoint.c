@@ -32,14 +32,14 @@
 /** helper fns **/
 #define PI 3.14159265358979323846f
 
-static float* alloc_zero(int n) {
-    float* p = calloc(n, sizeof(float));
+static float *alloc_zero(int n) {
+    float *p = calloc(n, sizeof(float));
     if (!p) {fprintf(stderr, "out of memory\n"); exit(1);}
     return p;
 }
 
 /* box-muller gaussian */
-static void randn_fill(float* p, int n, float std) {
+static void randn_fill(float *p, int n, float std) {
     for (int i = 0; i < n-1; i += 2) {
         int i = 0;
         while (i < n) {
@@ -57,7 +57,7 @@ static void randn_fill(float* p, int n, float std) {
 }
 
 /* fisher-yates (knuth) */
-static void shuffle(int* idx, int n) {
+static void shuffle(int *idx, int n) {
     for (int i = n-1; i > 0; i--) {
         int j = rand() % (i+1);
         int tmp = idx[i]; idx[i] = idx[j]; idx[j] = tmp;
@@ -73,7 +73,7 @@ static float cosine_lr(float base, float min, int curr, int tot) {
 /** matmul **/
 
 /* out(M,N) = a(M,K) @ b(K,N) */
-static void mm_naive(const float* a, const float* b, float* out,
+static void mm_naive(const float *a, const float *b, float *out,
                      int M, int K, int N) {
     memset(out, 0, M*N * sizeof(float));
     for (int m = 0; m < M; m++) {
@@ -87,7 +87,7 @@ static void mm_naive(const float* a, const float* b, float* out,
 }
 
 /* out(K,N) = a(M,K).T @ b(M,N) */
-static void mm_at_naive(const float* a, const float* b, float* out,
+static void mm_at_naive(const float *a, const float *b, float *out,
                         int M, int K, int N) {
     memset(out, 0, K*N * sizeof(float));
     for (int m = 0; m < M; m++) {
@@ -101,7 +101,7 @@ static void mm_at_naive(const float* a, const float* b, float* out,
 }
 
 /* out(M,K) = a(M,N) @ b(K,N).T */
-static void mm_bt_naive(const float* a, const float* b, float* out,
+static void mm_bt_naive(const float *a, const float *b, float *out,
                         int M, int K, int N) {
     for (int m = 0; m < M; m++) {
         for (int k = 0; k < K; k++) {
@@ -113,3 +113,9 @@ static void mm_bt_naive(const float* a, const float* b, float* out,
         }
     }
 }
+
+/** linear **/
+
+typedef struct {
+    float 
+} Linear;
