@@ -94,7 +94,7 @@ static void mm_at_naive(const float* a, const float* b, float* out,
         for (int k = 0; k < K; k++) {
             float akm = a[m*K + k];
             for (int n = 0; n < N; n++) {
-                out[k*N + n] += a[m*K + k] * b[m*N + n];
+                out[k*N + n] += akm * b[m*N + n];
             }
         }
     }
