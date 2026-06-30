@@ -100,7 +100,7 @@ static void mm_at_naive(const float* a, const float* b, float* out,
     }
 }
 
-/* out(K,N) = a(M,N) @ b(K,N).T */
+/* out(M,K) = a(M,N) @ b(K,N).T */
 static void mm_bt_naive(const float* a, const float* b, float* out,
                         int M, int K, int N) {
     for (int m = 0; m < M; m++) {
