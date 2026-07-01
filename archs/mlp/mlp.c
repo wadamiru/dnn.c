@@ -117,5 +117,25 @@ static void mm_bt_naive(const float *a, const float *b, float *out,
 /** linear **/
 
 typedef struct {
-    float 
+    float *w, *b;     // (in*out), (out)
+    float *dw, *db;   // ''
+    float *_x;        // (B*in)
+    int   in, out;
 } Linear;
+
+static Linear ln_alloc(int in, int out) {
+    Linear ln;
+    ln.in = in; ln.out = out;
+    /* He (Kaiming) Normal */
+    ln.w = alloc_zero(in*out); randn_fill(ln.w, in*out, sqrtf(2.0/in));
+    ln.b = alloc_zero(out);
+    ln.dw = alloc_zero(in*out);
+    ln.db = alloc_zero(out);
+    ln._x = NULL;
+    return ln;
+}
+
+static void ln_free(Linear *ln) {
+    free(ln->w); free(ln->b); free(ln->dw); free(ln->db); free(ln->_x);
+}
+
