@@ -71,12 +71,17 @@ static float cosine_lr(float base, float min, int curr, int tot) {
 }
 
 /** matmul **/
+
+/*
+ * apple silicon AMX hardware acceleration for supported compilers.
+ * otherwise, the optimised yet naive approach for matmul.
+ */
 #ifdef USE_ACCELERATE
 #include <Accelerate/Accelerate.h>
 #endif
 
-/* out(M,N) = a(M,K) @ b(K,N) */
-static void mm(const float *a, const float *b, float *out,
+/* out(M,N) = a(M,K) @ b(K,N) : (X * w) */
+static void mm(const float *restrict a, const float *restrict b, float *restrict out,
                      int M, int K, int N) {
     #ifdef USE_ACCELERATE
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
@@ -94,8 +99,8 @@ static void mm(const float *a, const float *b, float *out,
     #endif
 }
 
-/* out(K,N) = a(M,K).T @ b(M,N) */
-static void mm_at(const float *a, const float *b, float *out,
+/* out(K,N) = a(M,K).T @ b(M,N) : (X.T * dout) */
+static void mm_at(const float *restrict a, const float *restrict b, float *restrict out,
                         int M, int K, int N) {
     #ifdef USE_ACCELERATE
         cblas_sgemm(CblasRowMajor, CblasTrans, CblasNoTrans,
@@ -113,8 +118,8 @@ static void mm_at(const float *a, const float *b, float *out,
     #endif
 }
 
-/* out(M,K) = a(M,N) @ b(K,N).T */
-static void mm_bt(const float *a, const float *b, float *out,
+/* out(M,K) = a(M,N) @ b(K,N).T : (dout * w.T) */
+static void mm_bt(const float *restrict a, const float *restrict b, float *restrict out,
                         int M, int K, int N) {
     #ifdef USE_ACCELERATE
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans,
@@ -130,6 +135,18 @@ static void mm_bt(const float *a, const float *b, float *out,
             }
         }
     #endif
+}
+
+/* bias */
+
+/* forwrad bias add: out(M, N) += b(N) */
+static void bias(float *restrict out, const float *restrict b,
+                 int M, int N) {
+    for (int m = 0; m < M; m++) {
+        for (int n = 0; n < N; n++) {
+            out[m*N + n] += b[n];
+        }
+    }
 }
 
 /** linear **/
