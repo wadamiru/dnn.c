@@ -137,15 +137,30 @@ static void mm_bt(const float *restrict a, const float *restrict b, float *restr
     #endif
 }
 
-/* bias */
+/** bias **/
 
-/* forwrad bias add: out(M, N) += b(N) */
+/* forwrad bias add: out(M,N) += b(N), broadcast across m */
 static void bias(float *restrict out, const float *restrict b,
                  int M, int N) {
     for (int m = 0; m < M; m++) {
         for (int n = 0; n < N; n++) {
             out[m*N + n] += b[n];
         }
+    }
+}
+
+/* backward bias grad:  db(N) = sum over m of dout(M,N) */
+/* accumulated in double, since for large M, float summation loses precision.
+ * extra cost is negligible.
+ */
+static void bias_grad(const float *restrict out, float *restrict db,
+                      int M, int N) {
+    for (int n = 0; n < N; n++) {
+        doubel acc = 0.0;
+        for (int m = 0; m < M; m++) {
+            acc += dout[m*N + n];
+        }
+        db[n] = (float)acc;
     }
 }
 
