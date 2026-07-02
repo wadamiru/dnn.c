@@ -171,10 +171,10 @@ typedef struct {
     float *dw, *db;   // ''
     float *_x;        // (B*in)
     int   in, out;
-} Linear;
+} Ln;
 
-static Linear ln_alloc(int in, int out) {
-    Linear ln;
+static Ln ln_alloc(int in, int out) {
+    Ln ln;
     ln.in = in; ln.out = out;
     /* He (Kaiming) Normal */
     ln.w = alloc_zero(in*out); randn_fill(ln.w, in*out, sqrtf(2.0/in));
