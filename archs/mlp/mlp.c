@@ -32,9 +32,9 @@
 /** helper fns **/
 #define PI 3.14159265358979323846f
 
-static float *callocSafe(int n) {
-    float *p = calloc(n, sizeof(float));
-    if (!p) {fprintf(stderr, "out of memory\n"); exit(1);}
+static void *callocSafe(size_t n) {
+    void *p = calloc(n, sizeof(float));
+    if (!p && n > 0) {fprintf(stderr, "[FATAL] calloc failed\n"); exit(1);}
     return p;
 }
 
