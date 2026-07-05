@@ -196,9 +196,9 @@ static void ln_free(Linear *ln) {
 }
 
 static void ln_forward(Ln *ln, const float *X, float *out, int N) {
-    /* out(N,ln->out) = X(N,ln->in) @ W(ln->in,ln->out) */
+    /* out(N,out) = X(N,in) @ W(in,out) */
     mm(X, ln->W, out, N, ln->in, ln->out);
-    /* out += b(ln->out) */
+    /* out += b(out) */
     add_bias(out, ln->b, N, ln->out);
     /* cache X for backward pass */
     free(ln->_X);
