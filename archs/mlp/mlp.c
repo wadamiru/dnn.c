@@ -183,10 +183,10 @@ static Ln ln_alloc(int in, int out) {
     Ln ln;
     ln.in = in; ln.out = out;
     /* He (Kaiming) Normal */
-    ln.W = alloc_zero(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
-    ln.b = alloc_zero(out);
-    ln.dW = alloc_zero(in*out);
-    ln.db = alloc_zero(out);
+    ln.W = (float *)callocSafe(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
+    ln.b = (float *)callocSafe(out);
+    ln.dW = (float *)callocSafe(in*out);
+    ln.db = (float *)callocSafe(out);
     ln._X = NULL;
     return ln;
 }
