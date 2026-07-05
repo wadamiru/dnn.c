@@ -205,3 +205,8 @@ static void ln_forward(Ln *ln, const float *X, float *out, int N) {
     ln->_X = malloc_safe(N * ln->in * sizeof(float));
     memcpy(ln->_X, X, (size_t)N * ln->in * sizeof(float));
 }
+
+static ln_backward(Ln *ln, const float *dout, float *dX, int N) {
+    /* dW(in,out) = X.T(in,N) @ dout(N,out) */
+    
+}
