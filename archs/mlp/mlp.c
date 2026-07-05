@@ -32,14 +32,14 @@
 /** helper fns **/
 #define PI 3.14159265358979323846f
 
-static void *callocSafe(size_t n) {
-    void *p = calloc(n, sizeof(float));
+static float *callocSafe(size_t n) {
+    float *p = calloc(n, sizeof(float));
     if (!p && n > 0) {fprintf(stderr, "[FATAL] calloc failed\n"); exit(1);}
     return p;
 }
 
-static void *mallocSafe(size_t n) {
-    void *p = malloc(n);
+static float *mallocSafe(size_t n) {
+    float *p = malloc(n);
     if (!p && n > 0) {fprintf(stderr, "[FATAL] malloc failed\n"); exit(1);}
     return p;
 }
@@ -183,10 +183,10 @@ static Ln ln_alloc(int in, int out) {
     Ln ln;
     ln.in = in; ln.out = out;
     /* He (Kaiming) Normal */
-    ln.W = (float *)callocSafe(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
-    ln.b = (float *)callocSafe(out);
-    ln.dW = (float *)callocSafe(in*out);
-    ln.db = (float *)callocSafe(out);
+    ln.W = callocSafe(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
+    ln.b = callocSafe(out);
+    ln.dW = callocSafe(in*out);
+    ln.db = callocSafe(out);
     ln._X = NULL;
     return ln;
 }
