@@ -32,7 +32,7 @@
 /** helper fns **/
 #define PI 3.14159265358979323846f
 
-static float *alloc_zero(int n) {
+static float *callocSafe(int n) {
     float *p = calloc(n, sizeof(float));
     if (!p) {fprintf(stderr, "out of memory\n"); exit(1);}
     return p;
