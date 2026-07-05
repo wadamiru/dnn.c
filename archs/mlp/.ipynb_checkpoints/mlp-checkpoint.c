@@ -38,6 +38,12 @@ static float *callocSafe(int n) {
     return p;
 }
 
+static void *mallocSafe(size_t n) {
+    void *p = malloc(n);
+    if (!p && n > 0) {fprintf(stderr, "[FATAL] malloc failed\n"); exit(1);}
+    return p;
+}
+
 /* box-muller gaussian */
 static void randn_fill(float *p, int n, float std) {
     for (int i = 0; i < n-1; i += 2) {
