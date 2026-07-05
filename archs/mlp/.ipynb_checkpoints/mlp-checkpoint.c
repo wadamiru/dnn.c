@@ -32,13 +32,13 @@
 /** helper fns **/
 #define PI 3.14159265358979323846f
 
-static float *callocSafe(size_t n) {
+static float *calloc_safe(size_t n) {
     float *p = calloc(n, sizeof(float));
     if (!p && n > 0) {fprintf(stderr, "[FATAL] calloc failed\n"); exit(1);}
     return p;
 }
 
-static float *mallocSafe(size_t n) {
+static float *malloc_safe(size_t n) {
     float *p = malloc(n);
     if (!p && n > 0) {fprintf(stderr, "[FATAL] malloc failed\n"); exit(1);}
     return p;
