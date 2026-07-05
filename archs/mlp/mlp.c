@@ -19,7 +19,7 @@
 #define H2           512
 #define H3           256
 #define OUT_DIM      10
-#define B            256
+#define N            256
 #define EPOCHS       50
 #define LR           3e-4f
 #define WEIGHT_DECAY 1e-4f
@@ -167,9 +167,9 @@ static void bias_grad(const float *restrict out, float *restrict db,
 /** linear **/
 
 typedef struct {
-    float *w, *b;     // (in*out), (out)
-    float *dw, *db;   // ''
-    float *_x;        // (B*in)
+    float *W, *b;     // (in*out), (out)
+    float *dW, *db;   // ''
+    float *_X;        // (N*in)
     int   in, out;
 } Ln;
 
@@ -177,15 +177,21 @@ static Ln ln_alloc(int in, int out) {
     Ln ln;
     ln.in = in; ln.out = out;
     /* He (Kaiming) Normal */
-    ln.w = alloc_zero(in*out); randn_fill(ln.w, in*out, sqrtf(2.0/in));
+    ln.W = alloc_zero(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
     ln.b = alloc_zero(out);
-    ln.dw = alloc_zero(in*out);
+    ln.dW = alloc_zero(in*out);
     ln.db = alloc_zero(out);
-    ln._x = NULL;
+    ln._X = NULL;
     return ln;
 }
 
 static void ln_free(Linear *ln) {
-    free(ln->w); free(ln->b); free(ln->dw); free(ln->db); free(ln->_x);
+    free(ln->W); free(ln->b); free(ln->dW); free(ln->db); free(ln->_X);
 }
 
+static void ln_forward(Ln *ln, const float *X, float *out, int N) {
+    /* out(N,ln->out) = X(N,ln->in) @ W(ln->in,ln->out) */
+    mm(X, ln->W, out, N, ln->in, ln->out);
+    /* out += b(ln->out) */
+    add_bias(out, ln->b, N, ln->out);
+}
