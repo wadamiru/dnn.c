@@ -200,4 +200,8 @@ static void ln_forward(Ln *ln, const float *X, float *out, int N) {
     mm(X, ln->W, out, N, ln->in, ln->out);
     /* out += b(ln->out) */
     add_bias(out, ln->b, N, ln->out);
+    /* cache X for backward pass */
+    free(ln->_X);
+    ln->_X = malloc_safe(N * ln->in * sizeof(float));
+    memcpy(ln->_X, X, (size_t)N * ln->in * sizeof(float));
 }
