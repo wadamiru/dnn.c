@@ -19,9 +19,9 @@
 #define H2           512
 #define H3           256
 #define OUT_DIM      10
-#define N            256
+#define N_BATCH      256
 #define EPOCHS       50
-#define LR           3e-4f
+#define LEARNING_R   3e-4f
 #define WEIGHT_DECAY 1e-4f
 #define DROPOUT      0.3f
 #define EPS_BN       1e-5f
@@ -183,10 +183,10 @@ static Ln ln_alloc(int in, int out) {
     Ln ln;
     ln.in = in; ln.out = out;
     /* He (Kaiming) Normal */
-    ln.W = callocSafe(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
-    ln.b = callocSafe(out);
-    ln.dW = callocSafe(in*out);
-    ln.db = callocSafe(out);
+    ln.W = calloc_safe(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
+    ln.b = calloc_safe(out);
+    ln.dW = calloc_safe(in*out);
+    ln.db = calloc_safe(out);
     ln._X = NULL;
     return ln;
 }
