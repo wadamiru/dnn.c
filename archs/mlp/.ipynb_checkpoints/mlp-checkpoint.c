@@ -159,10 +159,10 @@ static void bias(float *restrict out, const float *restrict b,
 /* accumulated in double, since for large M, float summation loses precision.
  * extra cost is negligible.
  */
-static void bias_grad(const float *restrict out, float *restrict db,
+static void bias_grad(const float *restrict dout, float *restrict db,
                       int M, int N) {
     for (int n = 0; n < N; n++) {
-        doubel acc = 0.0;
+        double acc = 0.0;
         for (int m = 0; m < M; m++) {
             acc += dout[m*N + n];
         }
@@ -191,7 +191,7 @@ static Ln ln_alloc(int in, int out) {
     return ln;
 }
 
-static void ln_free(Linear *ln) {
+static void ln_free(Ln *ln) {
     free(ln->W); free(ln->b); free(ln->dW); free(ln->db); free(ln->_X);
 }
 
@@ -199,16 +199,16 @@ static void ln_forward(Ln *ln, const float *X, float *out, int N) {
     /* out(N,out) = X(N,in) @ W(in,out) */
     mm(X, ln->W, out, N, ln->in, ln->out);
     /* out += b(out) */
-    add_bias(out, ln->b, N, ln->out);
+    bias(out, ln->b, N, ln->out);
     /* cache X for backward pass */
     free(ln->_X);
     ln->_X = malloc_safe(N * ln->in * sizeof(float));
     memcpy(ln->_X, X, (size_t)N * ln->in * sizeof(float));
 }
 
-static ln_backward(Ln *ln, const float *dout, float *dX, int N) {
+static void ln_backward(Ln *ln, const float *dout, float *dX, int N) {
     /* dW(in,out) = X.T(in,N) @ dout(N,out) */
-    mm_at(ln->_X, dout, N, ln->in, ln->out);
+    mm_at(ln->_X, dout, ln->dW, N, ln->in, ln->out);
     /* db(out) = sum of dout(N, out) over N */
     bias_grad(dout, ln->db, N, ln->out);
     /* dX(N,in) = dout(N,out) @ W.T(out,in) */
