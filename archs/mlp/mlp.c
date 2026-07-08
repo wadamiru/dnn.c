@@ -208,5 +208,12 @@ static void ln_forward(Ln *ln, const float *X, float *out, int N) {
 
 static ln_backward(Ln *ln, const float *dout, float *dX, int N) {
     /* dW(in,out) = X.T(in,N) @ dout(N,out) */
-    
+    mm_at(ln->_X, dout, N, ln->in, ln->out);
+    /* db(out) = sum of dout(N, out) over N */
+    bias_grad(dout, ln->db, N, ln->out);
+    /* dX(N,in) = dout(N,out) @ W.T(out,in) */
+    /* dX = NULL for the first layer */
+    if (dX) mm_bt(dout, ln->W, dX, N, ln->in, ln->out);
+    free(ln->_X);
+    ln->_X = NULL;
 }
