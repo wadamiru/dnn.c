@@ -217,3 +217,12 @@ static void ln_backward(Ln *ln, const float *dout, float *dX, int N) {
     free(ln->_X);
     ln->_X = NULL;
 }
+
+/** batchnorm **/
+typedef struct {
+    float *gamma, *beta;     // (dim)
+    float *dgamma, *dbeta;   // ''
+    float *_X_hat;           // (N*dim)
+    float *_var_eps;         // (dim)
+    int   dim;
+} BN;
