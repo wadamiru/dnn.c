@@ -223,6 +223,20 @@ typedef struct {
     float *gamma, *beta;     // (dim)
     float *dgamma, *dbeta;   // ''
     float *_X_hat;           // (N*dim)
-    float *_var_eps;         // (dim)
+    float *_eps;             // (dim)
     int   dim;
 } BN;
+
+static BN bn_alloc(int dim) {
+    BN bn;
+    bn.dim     = dim;
+    bn.gamma   = calloc_safe(dim);
+    for (int i = 0; i < dim; i++) bn.gamma[i] = 1.0f;
+    bn.beta    = calloc_safe(dim);
+    bn.dgamma  = calloc_safe(dim);
+    bn.dbeta   = calloc_safe(dim);
+    bn._X_hat  = NULL;
+    bn._eps    = NULL;
+    return bn;
+}
+
