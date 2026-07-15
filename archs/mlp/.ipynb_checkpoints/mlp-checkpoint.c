@@ -227,14 +227,14 @@ typedef struct {
     int    D;
 } BN;
 
-static BN bn_alloc(int dim) {
+static BN bn_alloc(int D) {
     BN bn;
-    bn.dim      = dim;
-    bn.gamma    = calloc_safe(dim);
-    for (int i = 0; i < dim; i++) bn.gamma[i] = 1.0f;
-    bn.beta     = calloc_safe(dim);
-    bn.dgamma   = calloc_safe(dim);
-    bn.dbeta    = calloc_safe(dim);
+    bn.D        = D;
+    bn.gamma    = calloc_safe(D);
+    for (int i = 0; i < D; i++) bn.gamma[i] = 1.0f;
+    bn.beta     = calloc_safe(D);
+    bn.dgamma   = calloc_safe(D);
+    bn.dbeta    = calloc_safe(D);
     bn._X_hat   = NULL;
     bn._inv_std = NULL;
     return bn;
@@ -246,3 +246,6 @@ static void bn_free(BN *bn) {
     free(bn->_X_hat); free(bn->_inv_std);
 }
 
+static void bn_forward(BN *bn, const float *X, float *out, int N) {
+    int D = bn->D;
+}
