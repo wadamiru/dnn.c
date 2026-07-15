@@ -32,7 +32,7 @@
 /** helper fns **/
 #define PI 3.14159265358979323846f
 
-static float *calloc_safe(size_t n) {
+static float *callocf_safe(size_t n) {
     float *p = calloc(n, sizeof(float));
     if (!p && n > 0) {fprintf(stderr, "[FATAL] calloc failed\n"); exit(1);}
     return p;
@@ -183,10 +183,10 @@ static Ln ln_alloc(int in, int out) {
     Ln ln;
     ln.in = in; ln.out = out;
     /* He (Kaiming) Normal */
-    ln.W = calloc_safe(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
-    ln.b = calloc_safe(out);
-    ln.dW = calloc_safe(in*out);
-    ln.db = calloc_safe(out);
+    ln.W = callocf_safe(in*out); randn_fill(ln.W, in*out, sqrtf(2.0/in));
+    ln.b = callocf_safe(out);
+    ln.dW = callocf_safe(in*out);
+    ln.db = callocf_safe(out);
     ln._X = NULL;
     return ln;
 }
@@ -230,11 +230,11 @@ typedef struct {
 static BN bn_alloc(int D) {
     BN bn;
     bn.D        = D;
-    bn.gamma    = calloc_safe(D);
+    bn.gamma    = callocf_safe(D);
     for (int i = 0; i < D; i++) bn.gamma[i] = 1.0f;
-    bn.beta     = calloc_safe(D);
-    bn.dgamma   = calloc_safe(D);
-    bn.dbeta    = calloc_safe(D);
+    bn.beta     = callocf_safe(D);
+    bn.dgamma   = callocf_safe(D);
+    bn.dbeta    = callocf_safe(D);
     bn._X_hat   = NULL;
     bn._inv_std = NULL;
     return bn;
