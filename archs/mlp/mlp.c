@@ -240,3 +240,9 @@ static BN bn_alloc(int dim) {
     return bn;
 }
 
+static void bn_free(BN *bn) {
+    free(bn->gamma); free(bn->beta);
+    free(bn->dgamma); free(bn->dbeta);
+    free(bn->_X_hat); free(bn->_eps);
+}
+
