@@ -223,26 +223,26 @@ typedef struct {
     float *gamma, *beta;     // (D)
     float *dgamma, *dbeta;   // ''
     float *_X_hat;           // (N*D)
-    float *_eps;             // (D)
+    float *_inv_std;         // (D)
     int    D;
 } BN;
 
 static BN bn_alloc(int dim) {
     BN bn;
-    bn.dim     = dim;
-    bn.gamma   = calloc_safe(dim);
+    bn.dim      = dim;
+    bn.gamma    = calloc_safe(dim);
     for (int i = 0; i < dim; i++) bn.gamma[i] = 1.0f;
-    bn.beta    = calloc_safe(dim);
-    bn.dgamma  = calloc_safe(dim);
-    bn.dbeta   = calloc_safe(dim);
-    bn._X_hat  = NULL;
-    bn._eps    = NULL;
+    bn.beta     = calloc_safe(dim);
+    bn.dgamma   = calloc_safe(dim);
+    bn.dbeta    = calloc_safe(dim);
+    bn._X_hat   = NULL;
+    bn._inv_std = NULL;
     return bn;
 }
 
 static void bn_free(BN *bn) {
     free(bn->gamma); free(bn->beta);
     free(bn->dgamma); free(bn->dbeta);
-    free(bn->_X_hat); free(bn->_eps);
+    free(bn->_X_hat); free(bn->_inv_std);
 }
 
