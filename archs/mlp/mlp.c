@@ -248,4 +248,12 @@ static void bn_free(BN *bn) {
 
 static void bn_forward(BN *bn, const float *X, float *out, int N) {
     int D = bn->D;
+    free(bn->_X_hat);
+    bn->_X_hat = callocf_safe(N*D);
+    free(bn->_inv_std);
+    bn->_inv_std = callocf_safe(D);
+
+    /* mean */
+    float *mu = callocf_safe(D);
+    
 }
