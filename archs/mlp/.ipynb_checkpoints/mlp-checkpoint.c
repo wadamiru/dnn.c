@@ -220,11 +220,11 @@ static void ln_backward(Ln *ln, const float *dout, float *dX, int N) {
 
 /** batchnorm **/
 typedef struct {
-    float *gamma, *beta;     // (dim)
+    float *gamma, *beta;     // (D)
     float *dgamma, *dbeta;   // ''
-    float *_X_hat;           // (N*dim)
-    float *_eps;             // (dim)
-    int   dim;
+    float *_X_hat;           // (N*D)
+    float *_eps;             // (D)
+    int    D;
 } BN;
 
 static BN bn_alloc(int dim) {
