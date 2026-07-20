@@ -235,7 +235,7 @@ static BN bn_alloc(int D) {
     bn.beta     = callocf_safe(D);
     bn.dgamma   = callocf_safe(D);
     bn.dbeta    = callocf_safe(D);
-    bn._X_hat   = NULL;
+    bn._x_hat   = NULL;
     bn._inv_std = NULL;
     return bn;
 }
@@ -243,13 +243,13 @@ static BN bn_alloc(int D) {
 static void bn_free(BN *bn) {
     free(bn->gamma); free(bn->beta);
     free(bn->dgamma); free(bn->dbeta);
-    free(bn->_X_hat); free(bn->_inv_std);
+    free(bn->_x_hat); free(bn->_inv_std);
 }
 
 static void bn_forward(BN *bn, const float *X, float *out, int N) {
     int D = bn->D;
-    free(bn->_X_hat);
-    bn->_X_hat = callocf_safe(N*D);
+    free(bn->_x_hat);
+    bn->_x_hat = callocf_safe(N*D);
     free(bn->_inv_std);
     bn->_inv_std = callocf_safe(D);
 
@@ -274,11 +274,36 @@ static void bn_forward(BN *bn, const float *X, float *out, int N) {
     /* X_hat and output */
     for (int n = 0; n < N; n++)
         for (int d = 0; d < D; d++) {
-            float xhat = (X[n*D + d] - mu[d]) * bn->_inv_std[d];
-            bn->_X_hat[n*D + d] = xhat;
+            float x_hat = (X[n*D + d] - mu[d]) * bn->_inv_std[d];
+            bn->_x_hat[n*D + d] = x_hat;
             out[n*D + d] = bn->gamma[d] * xhat + bn->beta[d]; // (N,D)
         }
 
     free(mu);
     free(var);
+}
+
+static void bn_backward(BN *bn, const float *dout, float *dX, int N) {
+    int D = bn->D;
+    const float *x_hat = bn->_x_hat;
+    const float *inv_std = bn->_inv_std;
+
+    /* dgamma, dbeta */
+    memset(bn->dgamma, 0, D*sizeof(float));
+    memset(bn->dbeta, 0, D*siceof(float));
+    for (int n = 0; n < N; n++)
+        for (int d = 0; d < D; d++) {
+            bn->dgamma[d] += dout[n*D + d] * x_hat[n*D + d];
+            bn->dbeta[d] += dout[n*D + d];
+        }
+
+    /* dL/dX - closed form */
+    for (int n = 0; n < N; n++)
+        for (int d = 0; d < D; d++) {
+            float t = N * dout[n*D + d] - bn->dbeta[d] - x_hat[n*D + d] * bn->dgamma[d];
+            dX[n*D + d] = bn->gamma[d] * inv_std[d] * t / N;
+        }
+
+    free(bn->_x_hat);   bn->_x_hat = NULL;
+    free(bn->_inv_std); bn->_inv_std = NULL;
 }
