@@ -1,2 +1,4 @@
 # dnn.c
-Building and training deep neural networks in pure c.
+deep neural networks in pure c.
+
+MIT License
