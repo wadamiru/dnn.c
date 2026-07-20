@@ -255,5 +255,12 @@ static void bn_forward(BN *bn, const float *X, float *out, int N) {
 
     /* mean */
     float *mu = callocf_safe(D);
-    
+    for (int n = 0; n < N; n++) {
+        for (int d = 0; d < D; d++) mu[d] += X[n*D + d];
+    }
+    for (int d = 0; d < D; d++) mu[d] /= N;
+
+    /* var */
+    float *var = callocf_safe(D);
+    for (int n=0)
 }
