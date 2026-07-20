@@ -222,7 +222,7 @@ static void ln_backward(Ln *ln, const float *dout, float *dX, int N) {
 typedef struct {
     float *gamma, *beta;     // (D)
     float *dgamma, *dbeta;   // ''
-    float *_X_hat;           // (N*D)
+    float *_x_hat;           // (N*D)
     float *_inv_std;         // (D)
     int    D;
 } BN;
@@ -276,7 +276,7 @@ static void bn_forward(BN *bn, const float *X, float *out, int N) {
         for (int d = 0; d < D; d++) {
             float x_hat = (X[n*D + d] - mu[d]) * bn->_inv_std[d];
             bn->_x_hat[n*D + d] = x_hat;
-            out[n*D + d] = bn->gamma[d] * xhat + bn->beta[d]; // (N,D)
+            out[n*D + d] = bn->gamma[d] * x_hat + bn->beta[d]; // (N,D)
         }
 
     free(mu);
@@ -290,7 +290,7 @@ static void bn_backward(BN *bn, const float *dout, float *dX, int N) {
 
     /* dgamma, dbeta */
     memset(bn->dgamma, 0, D*sizeof(float));
-    memset(bn->dbeta, 0, D*siceof(float));
+    memset(bn->dbeta, 0, D*sizeof(float));
     for (int n = 0; n < N; n++)
         for (int d = 0; d < D; d++) {
             bn->dgamma[d] += dout[n*D + d] * x_hat[n*D + d];
