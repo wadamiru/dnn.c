@@ -34,13 +34,13 @@
 
 static float *callocf_safe(size_t n) {
     float *p = calloc(n, sizeof(float));
-    if (!p && n > 0) {fprintf(stderr, "[FATAL] calloc failed\n"); exit(1);}
+    if (!p && n>0) {fprintf(stderr, "[FATAL] calloc failed\n"); exit(1);}
     return p;
 }
 
 static float *malloc_safe(size_t n) {
     float *p = malloc(n);
-    if (!p && n > 0) {fprintf(stderr, "[FATAL] malloc failed\n"); exit(1);}
+    if (!p && n>0) {fprintf(stderr, "[FATAL] malloc failed\n"); exit(1);}
     return p;
 }
 
@@ -255,12 +255,30 @@ static void bn_forward(BN *bn, const float *X, float *out, int N) {
 
     /* mean */
     float *mu = callocf_safe(D);
-    for (int n = 0; n < N; n++) {
+    for (int n = 0; n < N; n++)
         for (int d = 0; d < D; d++) mu[d] += X[n*D + d];
-    }
     for (int d = 0; d < D; d++) mu[d] /= N;
 
     /* var */
     float *var = callocf_safe(D);
-    for (int n=0)
+    for (int n = 0; n < N; n++)
+        for (int d = 0; d < D; d++) {
+            float dif = X[n*D + d] - mu[d];
+            var[d] += dif * dif;
+        }
+    for (int d = 0; d < D; d++) {
+        var[d] /= N;
+        bn->_inv_std[d] = 1.0f / sqrtf(var[d] + EPS_BN);
+    }
+
+    /* X_hat and output */
+    for (int n = 0; n < N; n++)
+        for (int d = 0; d < D; d++) {
+            float xhat = (X[n*D + d] - mu[d]) * bn->_inv_std[d];
+            bn->_X_hat[n*D + d] = xhat;
+            out[n*D + d] = bn->gamma[d] * xhat + bn->beta[d]; // (N,D)
+        }
+
+    free(mu);
+    free(var);
 }
