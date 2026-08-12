@@ -42,3 +42,7 @@ typedef struct {
     int *sizes;    // (nlayers+1), sizes[0] = input dim
     Layer *layers;
 } MLP;
+
+static double sigmoid(double z) {
+    return 1.0 / (1.0 + exp(-z));
+}
