@@ -11,3 +11,28 @@
  *          ./train encoder
  *          ./train symmetry
  */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+/* the lib */
+
+typedef struct {
+    int nin;
+    int nout;
+
+    double *W;     // (nin, nout), row-major
+    double *b;     // (nout,)
+
+    double *dW;    // grad acc., same shape
+    double *db;
+
+    double *vW;    // momentum buffers, Eq. 8
+    doubel *vb;
+
+    double *net;   // (nout,) pre-act
+    double *out;   // (nout,) act
+    double *delta; // (nout,) error
+} Layer;
