@@ -36,3 +36,9 @@ typedef struct {
     double *out;   // (nout,) act
     double *delta; // (nout,) error
 } Layer;
+
+typedef struct {
+    int nlayers;
+    int *sizes;    // (nlayers+1), sizes[0] = input dim
+    Layer *layers;
+} MLP;
