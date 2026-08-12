@@ -46,3 +46,8 @@ typedef struct {
 static double sigmoid(double z) {
     return 1.0 / (1.0 + exp(-z));
 }
+
+// uniform random double in [-r, +r]
+static double frand(double r) {
+    return ((double)rand() / (double)RAND_MAX * 2.0 - 1.0) * r;
+}
