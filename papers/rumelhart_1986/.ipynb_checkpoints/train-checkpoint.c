@@ -52,10 +52,10 @@ static double frand(double r) {
     return ((double)rand() / (double)RAND_MAX * 2.0 - 1.0) * r;
 }
 
-// safe malloc, type-size * n
-static void *xmalloc(size_t size) {
-    void *p = malloc(size);
-    if (!p && size > 0) {
+// safe calloc, (n, type-size)
+static void *xcalloc(size_t n, size_t size) {
+    void *p = calloc(n, size);
+    if (!p && n > 0 && size > 0) {
         fprintf(stderr, "[ERROR] malloc failed\n");
         exit(EXIT_FAILURE);
     }
