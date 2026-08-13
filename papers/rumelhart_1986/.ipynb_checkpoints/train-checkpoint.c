@@ -51,3 +51,17 @@ static double sigmoid(double z) {
 static double frand(double r) {
     return ((double)rand() / (double)RAND_MAX * 2.0 - 1.0) * r;
 }
+
+// safe malloc, type-size * n
+static void *xmalloc(size_t size) {
+    void *p = malloc(size);
+    if (!p && size > 0) {
+        fprintf(stderr, "[ERROR] malloc failed\n");
+        exit(EXIT_FAILURE);
+    }
+    return p;
+}
+
+static MLP *mlp_init(const int *sizes, int nlayers, double init_r, unsigned int seed) {
+    srand(seed);
+}
