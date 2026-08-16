@@ -94,3 +94,17 @@ static MLP *mlp_init(const int *sizes, int nlayers, double init_r, unsigned int 
     }
     return net;
 }
+
+static void mlp_free(MLP *net) {
+    if (!net) return;
+    for (int l = 0; l < net->nlayers; l++) {
+        Layer *L = &net->layers[l];
+        free(L->W); free(L->b);
+        free(L->dW); free(L->db);
+        free(L->vW); free(L->vb);
+        free(L->net); free(L->out); free(L->delta);
+    }
+    free(net->layers);
+    free(net->sizes);
+    free(net);
+}
