@@ -64,4 +64,33 @@ static void *xcalloc(size_t n, size_t size) {
 
 static MLP *mlp_init(const int *sizes, int nlayers, double init_r, unsigned int seed) {
     srand(seed);
+
+    MLP *net = xcalloc(1, sizeof(MLP));
+    net->nlayers = nlayers;
+    net->sizes = xcalloc((size_t)(nlayers+1), sizeof(int));
+    memcpy(net->sizes, sizes, sizeof(int) * (size_t)(nlayers+1));
+    net->layers = xcalloc((size_t)nlayers, sizeof(Layer));
+
+    for (int l = 0; l < nlayers; l++) {
+        int nin = sizes[l];
+        int nout = sizes[l+1];
+        Layer *L = &net->layers[l];
+
+        L->nin = nin;
+        L->nout = nout;
+
+        L->W = xcalloc((size_t)(nin*nout), sizeof(double));
+        L->b = xcalloc((size_t)nout, sizeof(double));
+        L->dW = xcalloc((size_t)(nin*nout), sizeof(double));
+        L->db = xcalloc((size_t)nout, sizeof(double));
+        L->vW = xcalloc((size_t)(nin*nout), sizeof(double));
+        L->vb = xcalloc((size_t)nout, sizeof(double));
+        L->net = xcalloc((size_t)nout, sizeof(double));
+        L->out = xcalloc((size_t)nout, sizeof(double));
+        L->delta = xcalloc((size_t)nout, sizeof(double));
+
+        for (int i = 0; i < nin*nout; i++) L->W[i] = frand(init_r);
+        for (int i = 0; i < nout; i++) L->b[i] = frand(init_r);
+    }
+    return net;
 }
