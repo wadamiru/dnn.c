@@ -23,7 +23,7 @@ typedef struct {
     int nin;
     int nout;
 
-    double *W;     // (nin, nout), row-major
+    double *W;     // (nout, nin)
     double *b;     // (nout,)
 
     double *dW;    // grad acc., same shape
@@ -47,12 +47,12 @@ static double sigmoid(double z) {
     return 1.0 / (1.0 + exp(-z));
 }
 
-// uniform random double in [-r, +r]
+/* uniform random double in [-r, +r] */
 static double frand(double r) {
     return ((double)rand() / (double)RAND_MAX * 2.0 - 1.0) * r;
 }
 
-// safe calloc, (n, type-size)
+/* safe calloc, (n, type-size) */
 static void *xcalloc(size_t n, size_t size) {
     void *p = calloc(n, size);
     if (!p && n > 0 && size > 0) {
@@ -107,4 +107,31 @@ static void mlp_free(MLP *net) {
     free(net->layers);
     free(net->sizes);
     free(net);
+}
+
+/* forward-prop one input vector (length sizes[0])
+ * returns a ptr to the output layer's activations,
+ * owned by the net. */
+static const double *mlp_fwd(MLP *net, const double *in) {
+    const double *curin = in;            // rumelhart col vec. (nin,)
+    
+    for (int l = 0; l < net->nlayers; l++) {
+        Layer *L = &net->layers[l];
+        for (int j = 0; j < L->nout; j++) {
+            double netj = L->b[j];
+            // W is stored row-major with shape (nout, nin)
+            // extract row j containing in-weights for output unit j
+            const double *Wrow = &L->W[j * L->nin];
+            // continuous memory stride across cols maximizes cache locality
+            for (int i = 0; i < L->nin; i++) {
+                netj += Wrow[i] * curin[i];
+            }
+            L->net[j] = netj;
+            L->out[j] = sigmoid(netj);
+        }
+        // cascade outs as inputs to the next layer
+        curin = L->out;
+    }
+    // last layer's activation
+    return net->layers[net->nlayers-1].out;
 }
