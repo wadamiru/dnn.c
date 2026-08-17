@@ -87,6 +87,13 @@ Since $x_k = \sum_j w_{kj} y_j + \theta_k$, we have $\frac{\partial x_k}{\partia
 
 $$\delta_j = f'(x_j) \sum_{k} \delta_k w_{kj} = y_j (1 - y_j) \sum_{k} \delta_k w_{kj}$$
 
+### Final Gradients
+**Weight Gradient:**
+$$\frac{\partial E_p}{\partial w_{ji}} = \delta_j \, y_i$$
+
+**Bias Gradient:**
+$$\frac{\partial E_p}{\partial \theta_j} = \delta_j$$
+
 ---
 
 ## 5. Weight & Bias Update Rules
