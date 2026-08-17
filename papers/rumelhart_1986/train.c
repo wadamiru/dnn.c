@@ -135,3 +135,54 @@ static const double *mlp_fwd(MLP *net, const double *in) {
     // last layer's activation
     return net->layers[net->nlayers-1].out;
 }
+
+
+/* Back-propagate the error for the pattern just forward-propagated,
+ * given its target vector. Accumulates into each layer's dW/db.
+ * Returns the pattern's error E */
+static double mlp_bwd(MLP *net, const double *in, const double *target) {
+    int nlayers = net->nlayers;
+    Layer *Lout = &net->layers[net->nlayers-1];
+
+    // output layer: delta_j = (t_j - o_j) o_j (1 - o_j)
+    double err = 0.0;
+    for (int j = 0; j < Lout->nout; j++) {
+        double o = Lout->out[j];
+        double diff = target[j] - o;
+        err += 0.5 * diff * diff;
+        Lout->delta[j] = diff * o * (1.0 - o);
+    }
+
+    // Hidden layers, propagated backward:
+    // delta_j = o_j (1 - o_j) * sum_k delta_k w_kj
+    for (int l = nlayers-2; l >= 0; l--) {
+        Layer *L = &net->layers[l];
+        Layer *next = &net->layers[l+1];
+        for (int j = 0; j < L->nout; j++) {
+            double sum = 0.0;
+            for (k = 0; k < next->nout; k++) {
+                sum += next->delta[k] * next->W[k*next->nin + j];
+            }
+            double o = L->out[j];
+            L->delta[j] = sum * o * (1.0 - o);
+        }
+    }
+
+    // Accumulate gradients: dE/dw_ji ~ delta_j * o_i, where o_i is
+    // L's input (previous layer's output, or the network
+    // input for layer 0)
+    for (int l = 0; l < nlayers; l++) {
+        Layer *L = &net->layers[l];
+        const double *layer_in = (l == 0) ? input : net->layers[l - 1].out;
+        for (int j = 0; j < L->nout; j++) {
+            double dj = L->delta[j];
+            L->db[j] += dj;
+            double *dWrow = &L->dW[j * L->nin];
+            for (int i = 0; i < L->nin; i++) {
+                dWrow[i] += dj * layer_in[i];
+            }
+        }
+    }
+
+    return err;
+}
