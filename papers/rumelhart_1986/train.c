@@ -208,3 +208,63 @@ static void mlp_update(MLP *net, double lr, double m) {
         }
     }
 }
+
+
+/*
+ * Demo 1: XOR - the problem the paper opens with. Not linearly
+ * separable, so no single layer of units can compute it; a 2-2-1
+ * network with one hidden layer can.
+ */
+static int run_xor(void) {
+    printf("--- XOR (2-2-1) ---\n");
+ 
+    int sizes[] = {2, 2, 1};
+    MLP *net = mlp_init(sizes, 2, 0.5, 42);
+ 
+    double X[4][2] = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+    double Y[4][1] = {{0},    {1},    {1},    {0}};
+ 
+    double lr = 0.5, m = 0.9;
+    int epochs = 5000;
+ 
+    for (int e = 0; e < epochs; e++) {
+        double toterr = 0.0;
+        for (int p = 0; p < 4; p++) {
+            mlp_fwd(net, X[p]);
+            toterr += mlp_bwd(net, X[p], Y[p]);
+            mlp_update(net, lr, m);
+        }
+        if (e % 1000 == 0 || e == epochs - 1) {
+            printf("  epoch %5d | tot error %.6f\n", e, toterr);
+        }
+    }
+ 
+    printf("\n - final predictions -\n");
+    int all_correct = 1;
+    for (int p = 0; p < 4; p++) {
+        const double *o = mlp_fwd(net, X[p]);
+        int pred = o[0] > 0.5;
+        int target = (int)Y[p][0];
+        if (pred != target) all_correct = 0;
+        printf("    %d XOR %d = %.4f  (target %d, rounds to %d)\n",
+               (int)X[p][0], (int)X[p][1], o[0], target, pred);
+    }
+    printf("\n  %s\n\n", all_correct ? "PASS: learned XOR" : "FAIL: did not converge");
+ 
+    mlp_free(net);
+    return all_correct;
+}
+
+/* ================================================================
+ * main — dispatch on argv[1], or run all three demos if none given.
+ * ================================================================ */
+int main(int argc, char **argv) {
+    const char *task = (argc > 1) ? argv[1] : "all";
+    int ok = 1;
+ 
+    if (strcmp(task, "xor") == 0) {
+        ok = run_xor();
+    }
+ 
+    return ok ? 0 : 1;
+}
