@@ -30,7 +30,7 @@ typedef struct {
     double *db;
 
     double *vW;    // momentum buffers, Eq. 8
-    doubel *vb;
+    double *vb;
 
     double *net;   // (nout,) pre-act
     double *out;   // (nout,) act
@@ -160,7 +160,7 @@ static double mlp_bwd(MLP *net, const double *in, const double *target) {
         Layer *next = &net->layers[l+1];
         for (int j = 0; j < L->nout; j++) {
             double sum = 0.0;
-            for (k = 0; k < next->nout; k++) {
+            for (int k = 0; k < next->nout; k++) {
                 sum += next->delta[k] * next->W[k*next->nin + j];
             }
             double o = L->out[j];
@@ -173,7 +173,7 @@ static double mlp_bwd(MLP *net, const double *in, const double *target) {
     // input for layer 0)
     for (int l = 0; l < nlayers; l++) {
         Layer *L = &net->layers[l];
-        const double *layer_in = (l == 0) ? input : net->layers[l - 1].out;
+        const double *layer_in = (l == 0) ? in : net->layers[l - 1].out;
         for (int j = 0; j < L->nout; j++) {
             double dj = L->delta[j];
             L->db[j] += dj;
@@ -201,7 +201,7 @@ static void mlp_update(MLP *net, double lr, double m) {
             L->dW[idx] = 0.0;
         }
         for (int j = 0; j < L->nout; j++) {
-            double step = lr * L->db[j] + momentum * L->vb[j];
+            double step = lr * L->db[j] + m * L->vb[j];
             L->b[j] += step;
             L->vb[j] = step;
             L->db[j] = 0.0;
