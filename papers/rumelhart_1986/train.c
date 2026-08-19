@@ -239,7 +239,7 @@ static int run_xor(void) {
         }
     }
  
-    printf("\n - final predictions -\n");
+    printf("\n > final predictions\n");
     int all_correct = 1;
     for (int p = 0; p < 4; p++) {
         const double *o = mlp_fwd(net, X[p]);
