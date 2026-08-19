@@ -186,3 +186,25 @@ static double mlp_bwd(MLP *net, const double *in, const double *target) {
 
     return err;
 }
+
+/* Apply the generalized delta rule with momentum using
+ * whatever has accumulated in dW/db, then zero the accumulators. */
+static void mlp_update(MLP *net, double lr, double m) {
+    for (int l = 0; l < net->nlayers; l++) {
+        Layer *L = &net->layers[l];
+        int nW = L->nin * L->nout;
+ 
+        for (int idx = 0; idx < nW; idx++) {
+            double step = lr * L->dW[idx] + m * L->vW[idx];
+            L->W[idx] += step;
+            L->vW[idx] = step;
+            L->dW[idx] = 0.0;
+        }
+        for (int j = 0; j < L->nout; j++) {
+            double step = lr * L->db[j] + momentum * L->vb[j];
+            L->b[j] += step;
+            L->vb[j] = step;
+            L->db[j] = 0.0;
+        }
+    }
+}
