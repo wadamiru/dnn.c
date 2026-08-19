@@ -255,15 +255,16 @@ static int run_xor(void) {
     return all_correct;
 }
 
-/* ================================================================
- * main — dispatch on argv[1], or run all three demos if none given.
- * ================================================================ */
 int main(int argc, char **argv) {
-    const char *task = (argc > 1) ? argv[1] : "all";
+    const char *task = (argc > 1) ? argv[1] : "-";
     int ok = 1;
- 
+
+    // more tasks are yet to be implemented
     if (strcmp(task, "xor") == 0) {
         ok = run_xor();
+    } else {
+        fprintf(stderr, "usage: %s [xor]\n", argv[0]);
+        return 2;
     }
  
     return ok ? 0 : 1;
